@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1">
+<title>Genius formula Version Excluesive</title>
+
+<style>
+:root{
+--bg:#020617;--card:#0f172a;--card2:#020617;
+--border:rgba(255,255,255,.12);
+--text:#f8fafc;--muted:#94a3b8;
+--player:#3b82f6;--banker:#ef4444;--tie:#22c55e;
+--gold1:#fde68a;--gold2:#eab308;
+--shadow:0 30px 70px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+background:#020617;
+color:var(--text);
+user-select:none;
+}
+.hidden{display:none}
+.page{padding:24px;max-width:620px;margin:auto}
+.card{
+background:linear-gradient(180deg,rgba(15,23,42,.96),rgba(2,6,23,.96));
+border-radius:22px;padding:20px;margin-bottom:20px;
+border:1px solid var(--border);
+box-shadow:var(--shadow);
+}
+h1{text-align:center;font-weight:900}
+h2{font-size:.8rem;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:6px}
+
+/* LOGIN */
+.login-box{
+max-width:360px;margin:130px auto;
+background:linear-gradient(180deg,#020617,#0f172a);
+border-radius:28px;padding:26px;
+border:1px solid var(--border);
+box-shadow:0 40px 80px rgba(0,0,0,.8);
+}
+.login-box h1{color:var(--gold1)}
+.login-box input{
+width:100%;padding:12px;margin-bottom:12px;
+border-radius:14px;border:1px solid var(--border);
+background:#020617;color:var(--text);
+}
+.login-box button{
+width:100%;padding:12px;border:none;
+border-radius:16px;font-weight:900;
+background:linear-gradient(135deg,var(--gold1),var(--gold2));
+cursor:pointer;
+}
+
+/* EXPIRED */
+.expired{
+max-width:420px;margin:160px auto;
+background:#020617;
+border:1px solid #7f1d1d;
+color:#fecaca;
+padding:26px;
+border-radius:22px;
+text-align:center;
+box-shadow:0 40px 80px rgba(0,0,0,.9);
+}
+.expired h1{color:#ef4444}
+.expired small{color:#94a3b8}
+
+/* UI */
+.counter{display:flex;gap:8px;font-weight:bold}
+.counter span{
+flex:1;background:rgba(255,255,255,.05);
+border:1px solid var(--border);
+padding:10px;border-radius:16px;text-align:center
+}
+.bead-road-container{
+overflow-x:auto;background:#020617;
+border-radius:16px;padding:14px;
+border:1px solid var(--border)
+}
+.bead-road-grid{
+display:grid;
+grid-template-rows:repeat(6,30px);
+grid-auto-flow:column;
+grid-auto-columns:30px;
+gap:4px;width:max-content
+}
+.bead-cell{
+width:30px;height:30px;
+display:flex;align-items:center;justify-content:center
+}
+.bead{
+width:24px;height:24px;border-radius:50%;
+display:flex;align-items:center;justify-content:center;
+font-size:10px;font-weight:900;color:#fff
+}
+.bead.p{background:#2563eb}
+.bead.b{background:#dc2626}
+.bead.t{background:#16a34a}
+
+.controls{display:flex;gap:14px;margin-bottom:14px}
+.btn{
+flex:1;border:none;border-radius:20px;
+padding:16px;font-size:1.15rem;
+font-weight:900;color:#fff
+}
+.btn-p{background:#2563eb}
+.btn-b{background:#dc2626}
+.btn-t{background:#16a34a}
+.btn-u{background:#475569}
+.btn-c{background:#7f1d1d}
+
+.strategy-item{
+border-bottom:1px dashed var(--border);
+padding:12px 0
+}
+.strategy-item.best{
+border-left:4px solid var(--gold1);
+padding-left:14px;
+background:rgba(234,179,8,.08);
+border-radius:16px
+}
+.win-pct{
+font-size:1.35rem;
+font-weight:900;color:var(--gold1)
+}
+.advice{
+padding:5px 14px;border-radius:999px;
+font-weight:900;color:#fff
+}
+.advice-p{background:var(--player)}
+.advice-b{background:var(--banker)}
+.main-advice{
+font-size:3rem;color:var(--gold1);
+font-weight:900;text-align:center
+}
+.exp-date{
+text-align:center;
+font-size:.75rem;
+color:#94a3b8;
+margin-top:6px
+}
+
+#ai-dna{
+margin-top:6px;
+font-size:14px;
+word-break:break-all;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="expiredBox" class="expired hidden">
+<h1>โปรแกรมหมดอายุ</h1>
+<p>วันหมดอายุ: 3 เมษายน พ.ศ. 2569</p>
+<small>กรุณาติดต่อผู้พัฒนา</small>
+</div>
+
+<div id="loginBox" class="login-box">
+<h1>Login</h1>
+<input id="user" placeholder="User">
+<input id="pass" type="password" placeholder="Password">
+<button type="button" onclick="doLogin()">เข้าสู่ระบบ</button>
+<div id="msg" style="text-align:center;color:#ef4444;margin-top:8px"></div>
+</div>
+
+<div id="app" class="hidden">
+<div class="page">
+
+<h1>Genius formula Version Excluesive</h1>
+<div class="exp-date">หมดอายุวันที่ 3 เมษายน พ.ศ. 2569</div>
+
+<div class="card counter">
+<span style="color:#3b82f6">P: <b id="cntP">0</b></span>
+<span style="color:#ef4444">B: <b id="cntB">0</b></span>
+<span style="color:#22c55e">T: <b id="cntT">0</b></span>
+<span>TOTAL: <b id="cntAll">0</b></span>
+</div>
+<div class="card">
+<h2>Bead Road</h2>
+<div class="bead-road-container">
+<div id="bead-road-grid" class="bead-road-grid"></div>
+</div>
+</div>
+
+<!-- AI ENGINE -->
+<div class="card">
+<h2>ULTIMATE AI ENGINE</h2>
+
+<div style="text-align:center;color:#94a3b8">
+ 10 DNA 7 AI  วิเคราะห์ 11 สูตร
+</div>
+
+<div id="ai-bet" style="
+font-size:3rem;
+font-weight:900;
+text-align:center;
+margin-top:10px">
+-
+</div>
+
+<div style="text-align:center;margin-top:6px">
+AI Confidence :
+<span id="ai-pct" style="color:#fde68a;font-weight:900">0%</span>
+</div>
+
+<div style="text-align:center;color:#94a3b8;margin-top:6px">
+Strategy :
+<span id="ai-name">-</span>
+</div>
+
+<div style="margin-top:10px">
+DNA 20 ตา
+<div id="ai-dna"></div>
+</div>
+
+</div>
+
+<!-- AI BEST STRATEGY -->
+<div class="card">
+
+<div style="text-align:center;color:#94a3b8;font-size:14px">
+แนะนำ: <span id="best-ai-name">-</span>
+</div>
+
+<div id="best-ai-pct" style="
+font-size:3.2rem;
+font-weight:900;
+text-align:center;
+color:#fde68a;
+margin-top:6px">
+0%
+</div>
+
+</div>
+
+<div class="card">
+  
+<h2>บันทึกผล</h2>
+
+<div class="controls">
+<button class="btn btn-p" onclick="addResult('P')">P</button>
+<button class="btn btn-b" onclick="addResult('B')">B</button>
+<button class="btn btn-t" onclick="addResult('T')">T</button>
+</div>
+
+<div class="controls">
+<button class="btn btn-u" onclick="undo()">Undo</button>
+<button class="btn btn-c" onclick="clearAll()">Clear</button>
+</div>
+
+</div>
+
+<div class="card">
+<h2>สูตรแนะนำ</h2>
+
+<div id="strategy-list"></div>
+
+<div id="best-name"
+style="text-align:center;color:#94a3b8">
+รอข้อมูล...
+</div>
+
+<div id="best-pct" class="main-advice">
+0%
+</div>
+
+</div>
+
+</div> <!-- ปิด page -->
+</div> <!-- ปิด app -->
+
+<script>
+/* ===== EXPIRATION ===== */
+const EXP_DATE=new Date('2026-04-03T00:00:00');
+const now=new Date();
+
+const expiredBox=document.getElementById('expiredBox');
+const loginBox=document.getElementById('loginBox');
+const app=document.getElementById('app');
+
+if(now>=EXP_DATE){
+ loginBox.classList.add('hidden');
+ app.classList.add('hidden');
+ expiredBox.classList.remove('hidden');
+}
+
+/* ===== LOGIN ===== */
+const msg=document.getElementById('msg');
+const userInput=document.getElementById('user');
+const passInput=document.getElementById('pass');
+
+function doLogin(){
+ if(new Date()>=EXP_DATE){
+  loginBox.classList.add('hidden');
+  expiredBox.classList.remove('hidden');
+  return;
+ }
+ if(userInput.value==='1234'&&passInput.value==='1234'){
+  loginBox.classList.add('hidden');
+  app.classList.remove('hidden');
+ }else msg.innerText='รหัสไม่ถูกต้อง';
+}
+
+/* ===== ใส่ตรงนี้เลย ===== */
+const last = (h,n)=> h.length>=n ? h[h.length-n] : 'NA';
+
+const flip = x =>
+ x==='P' ? 'B' :
+ x==='B' ? 'P' : 'NA';
+
+const majority = h => {
+ let p = h.filter(x=>x==='P').length;
+ let b = h.filter(x=>x==='B').length;
+ return p>b ? 'P' : b>p ? 'B' : 'NA';
+};
+
+/* ===== LOGIC เดิมทั้งหมด (ไม่แก้) ===== */
+let results=[];
+
+const strategies=[
+
+ {name:"Follow (ตามเค้า)",logic:h=>h[h.length-1]||'NA'},
+
+ {name:"Cut (ตัดเค้า)",logic:h=>h[h.length-1]==='P'?'B':h[h.length-1]==='B'?'P':'NA'},
+
+ {name:"Mirror-4 (ย้อนหลัง 4)",logic:h=>h.length>=4?h[h.length-4]:'NA'},
+
+ {name:"Majority (เค้ามาก)",logic:h=>{
+  let p=h.filter(x=>x==='P').length;
+  let b=h.filter(x=>x==='B').length;
+  return p>b?'P':b>p?'B':'NA';
+ }},
+
+ {name:"Last-2 Majority (สีมาก 2 ตาล่าสุด)",logic:h=>{
+  if(h.length<2)return'NA';
+  return h[h.length-1]===h[h.length-2]?h[h.length-1]:'NA';
+ }},
+
+ // ✅ ย้ายเข้ามาใน array
+ {name:"Anti-2 (ตัด 2)",logic:h=>h.length>=2&&h.at(-1)===h.at(-2)?(h.at(-1)==='P'?'B':'P'):'NA'},
+
+ {name:"Trend-3 (เทรนด์ 3)",logic:h=>h.length>=3&&h.slice(-3).every(x=>x===h.at(-1))?h.at(-1):'NA'},
+
+ {name:"Follow–Cut (ตาม–ตัด)",logic:h=>h.length>=2?(h.at(-1)===h.at(-2)?(h.at(-1)==='P'?'B':'P'):h.at(-1)):'NA'},
+
+ {name:"After-T Follow (ตามหลังเสมอ)",logic:h=>{
+  let i=h.lastIndexOf('T');
+  return i>=0&&h[i+1]?h[i+1]:'NA';
+ }}
+
+];
+
+for(let i=2;i<=6;i++){
+ strategies.push({name:`Follow-${i}`,logic:h=>last(h,i)});
+ strategies.push({name:`Cut-${i}`,logic:h=>flip(last(h,i))});
+ strategies.push({name:`Mirror-${i}`,logic:h=>last(h,i)});
+ strategies.push({name:`Major-${i}`,logic:h=>majority(h.slice(-i))});
+}
+
+strategies.push(
+{name:"Confirm-2-Then-Follow",logic:h=>h.length>=2&&h.at(-1)===h.at(-2)?h.at(-1):'NA'},
+{name:"Streak-2-Then-Cut",logic:h=>h.length>=2&&h.at(-1)===h.at(-2)?flip(h.at(-1)):'NA'},
+{name:"Alt-3-Follow",logic:h=>h.length>=3&&h.at(-1)===h.at(-3)&&h.at(-1)!==h.at(-2)?h.at(-1):'NA'},
+{name:"Last-4-Majority",logic:h=>h.length>=4?majority(h.slice(-4)):'NA'},
+{name:"Confirm-3-Then-Follow",logic:h=>h.length>=3&&h.at(-1)===h.at(-2)&&h.at(-2)===h.at(-3)?h.at(-1):'NA'},
+{name:"Confirm-3-Then-Cut",logic:h=>h.length>=3&&h.at(-1)===h.at(-2)&&h.at(-2)===h.at(-3)?flip(h.at(-1)):'NA'},
+{name:"Alt-2-Repeat",logic:h=>h.length>=3&&h.at(-1)!==h.at(-2)&&h.at(-2)!==h.at(-3)?h.at(-1):'NA'},
+{name:"Last-5-Majority",logic:h=>h.length>=5?majority(h.slice(-5)):'NA'},
+{name:"Break-After-2",logic:h=>h.length>=3&&h.at(-1)!==h.at(-2)&&h.at(-2)===h.at(-3)?h.at(-1):'NA'},
+{name:"Repeat-After-Switch",logic:h=>h.length>=3&&h.at(-1)===h.at(-3)&&h.at(-1)!==h.at(-2)?h.at(-1):'NA'},
+
+{name:"Reverse-Major-3",logic:h=>h.length>=3?flip(majority(h.slice(-3))):'NA'},
+{name:"Reverse-Major-5",logic:h=>h.length>=5?flip(majority(h.slice(-5))):'NA'},
+{name:"Reverse-Major-7",logic:h=>h.length>=7?flip(majority(h.slice(-7))):'NA'},
+{name:"Switch-Then-Wait-Follow",logic:h=>h.length>=3&&h.at(-1)!==h.at(-2)&&h.at(-2)!==h.at(-3)?h.at(-1):'NA'},
+{name:"Switch-Then-Wait-Cut",logic:h=>h.length>=3&&h.at(-1)!==h.at(-2)&&h.at(-2)!==h.at(-3)?flip(h.at(-1)):'NA'},
+{name:"Streak-5-Follow",logic:h=>h.length>=5&&h.slice(-5).every(x=>x===h.at(-1))?h.at(-1):'NA'},
+{name:"Streak-5-Cut",logic:h=>h.length>=5&&h.slice(-5).every(x=>x===h.at(-1))?flip(h.at(-1)):'NA'},
+{name:"Alt-4-Confirm",logic:h=>h.length>=4&&h.at(-1)===h.at(-3)&&h.at(-2)===h.at(-4)?h.at(-1):'NA'},
+{name:"Last-6-Mirror",logic:h=>h.length>=6?h.at(-6):'NA'},
+{name:"Gap-3-Cut",logic:h=>h.length>=4?flip(h.at(-3)):'NA'}
+);
+
+/* ===== FUNCTIONS ===== */
+function addResult(v){results.push(v);updateUI();}
+function undo(){results.pop();updateUI();}
+function clearAll(){if(confirm("ล้างข้อมูลทั้งหมด?")){results=[];updateUI();}}
+
+function calc(s){
+ let win=0,tot=0,hist=[];
+ for(let i=0;i<results.length;i++){
+  if(results[i]==='T')continue;
+  let sub=results.slice(0,i).filter(x=>x!=='T');
+  let p=s.logic(sub);
+  if(p!=='NA'){
+   tot++;
+   hist.push(p===results[i]?'✅':'❌');
+   if(p===results[i])win++;
+  }
+ }
+
+ let dna = hist.slice(-10)
+
+let win10 = dna.filter(x => x === "✅").length
+let total10 = dna.length
+
+let pct10 = total10 ? Math.round(win10 / total10 * 100) : 0
+
+ return{
+  pct:pct10,
+  dna:dna,
+  next:s.logic(results.filter(x=>x!=='T'))
+ }
+}   // ⭐ ต้องมีตัวนี้
+
+function calcAI(){
+
+let all=strategies.map(s=>{
+
+ let d=calc(s)
+
+ let last10=d.dna.slice(-10)
+
+ let momentum=last10.filter(x=>x==="✅").length
+
+ let stable=0
+ for(let i=1;i<last10.length;i++){
+  if(last10[i]===last10[i-1]) stable++
+ }
+
+ let score=
+ (d.pct*0.6)+
+ (momentum*5)+
+ (stable*2)
+
+ return{
+  name:s.name,
+  score:score,
+  next:d.next,
+  pct:d.pct,
+  dna:d.dna
+ }
+
+})
+
+all.sort((a,b)=>b.score-a.score)
+
+// ⭐ ข้ามสูตรที่ให้ NA
+let best = all.find(x => x.next !== 'NA' && x.pct > 0)
+
+return best || all[0]
+
+}
+
+function updateUI(){
+
+ document.getElementById('bead-road-grid').innerHTML =
+ results.map(r=>`<div class="bead-cell"><div class="bead ${r.toLowerCase()}">${r}</div></div>`).join('');
+
+ cntP.innerText = results.filter(x=>x==='P').length;
+ cntB.innerText = results.filter(x=>x==='B').length;
+ cntT.innerText = results.filter(x=>x==='T').length;
+ cntAll.innerText = results.length;
+
+ let all = strategies
+ .map(s=>({name:s.name,data:calc(s)}))
+ .sort((a,b)=>b.data.pct-a.data.pct);
+
+ let best = all[0]
+
+document.getElementById("best-ai-name").innerText =
+best.name
+
+document.getElementById("best-ai-pct").innerText =
+best.data.pct + "%"
+
+
+ const strategyBox = document.getElementById('strategy-list');
+
+if(strategyBox){
+ strategyBox.innerHTML =
+ all.map((x,i)=>{
+
+  const next = x.data.next;
+
+  return `
+  <div class="strategy-item ${i===0 && x.data.pct>0 ? 'best':''}">
+   <div style="display:flex;justify-content:space-between">
+    <b>${x.name}</b>
+    <div>
+     <span class="win-pct">${x.data.pct}%</span>
+
+     ${
+      next && next !== 'NA'
+      ? `<span class="advice advice-${next.toLowerCase()}">${next}</span>`
+      : `<span class="advice" style="background:#475569">-</span>`
+     }
+
+    </div>
+   </div>
+   <div>${x.data.dna.join(' ')}</div>
+  </div>
+  `;
+ }).join('');
+}
+
+ document.getElementById('best-name').innerText =
+ all[0].data.pct>0 ? `แนะนำ: ${all[0].name}` : 'รอผลถัดไป';
+
+ document.getElementById('best-pct').innerText =
+ all[0].data.pct + '%';
+
+
+ /* ===== AI ENGINE ===== */
+
+ let ai = calcAI()
+
+ if(ai){
+
+ document.getElementById('ai-bet').innerText = ai.next
+ document.getElementById('ai-bet').style.color =
+ai.next === 'P' ? '#3b82f6' :
+ai.next === 'B' ? '#ef4444' :
+'#fde68a'
+
+ document.getElementById('ai-pct').innerText =
+ Math.round(ai.score) + "%"
+
+ document.getElementById('ai-name').innerText =
+ ai.name
+
+ document.getElementById('ai-dna').innerHTML =
+ ai.dna.slice(-10).join(" ")
+
+ }
+}
+updateUI()
+</script>
+</body>
+</html>
