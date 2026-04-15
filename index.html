@@ -156,7 +156,7 @@ word-break:break-all;
 
 <div id="expiredBox" class="expired hidden">
 <h1>โปรแกรมหมดอายุ</h1>
-<p>วันหมดอายุ: 29 มีนาคม พ.ศ. 2569</p>
+<p>วันหมดอายุ: 17 เมษายน พ.ศ. 2569</p>
 <small>กรุณาติดต่อผู้พัฒนา</small>
 </div>
 
@@ -171,8 +171,8 @@ word-break:break-all;
 <div id="app" class="hidden">
 <div class="page">
 
-<h1>Genius formula Version Excluesive</h1>
-<div class="exp-date">หมดอายุวันที่ 29 มีนาคม พ.ศ. 2569</div>
+<h1>Genius formula Version Excluesive 7 Ai 20 Dna</h1>
+<div class="exp-date">หมดอายุวันที่ 17 เมษายน พ.ศ. 2569</div>
 
 <div class="card counter">
 <span style="color:#3b82f6">P: <b id="cntP">0</b></span>
@@ -192,7 +192,7 @@ word-break:break-all;
 <h2>ULTIMATE AI ENGINE</h2>
 
 <div style="text-align:center;color:#94a3b8">
- 10 DNA 7 AI  วิเคราะห์ 41 สูตร
+7 AI 20 Dna วิเคราะห์ 11 สูตร
 </div>
 
 <div id="ai-bet" style="
@@ -276,7 +276,7 @@ style="text-align:center;color:#94a3b8">
 
 <script>
 /* ===== EXPIRATION ===== */
-const EXP_DATE=new Date('2026-03-29T00:00:00');
+const EXP_DATE=new Date('2026-04-17T00:00:00');
 const now=new Date();
 
 const expiredBox=document.getElementById('expiredBox');
@@ -306,85 +306,106 @@ function doLogin(){
  }else msg.innerText='รหัสไม่ถูกต้อง';
 }
 
-/* ===== ใส่ตรงนี้เลย ===== */
-const last = (h,n)=> h.length>=n ? h[h.length-n] : 'NA';
-
-const flip = x =>
- x==='P' ? 'B' :
- x==='B' ? 'P' : 'NA';
-
-const majority = h => {
- let p = h.filter(x=>x==='P').length;
- let b = h.filter(x=>x==='B').length;
- return p>b ? 'P' : b>p ? 'B' : 'NA';
-};
-
 /* ===== LOGIC เดิมทั้งหมด (ไม่แก้) ===== */
 let results=[];
 
+/* ===== STRATEGIES BASE ===== */
 const strategies=[
-
  {name:"Follow (ตามเค้า)",logic:h=>h[h.length-1]||'NA'},
-
  {name:"Cut (ตัดเค้า)",logic:h=>h[h.length-1]==='P'?'B':h[h.length-1]==='B'?'P':'NA'},
-
  {name:"Mirror-4 (ย้อนหลัง 4)",logic:h=>h.length>=4?h[h.length-4]:'NA'},
-
  {name:"Majority (เค้ามาก)",logic:h=>{
   let p=h.filter(x=>x==='P').length;
   let b=h.filter(x=>x==='B').length;
   return p>b?'P':b>p?'B':'NA';
  }},
-
  {name:"Last-2 Majority (สีมาก 2 ตาล่าสุด)",logic:h=>{
   if(h.length<2)return'NA';
   return h[h.length-1]===h[h.length-2]?h[h.length-1]:'NA';
- }},
-
- // ✅ ย้ายเข้ามาใน array
- {name:"Anti-2 (ตัด 2)",logic:h=>h.length>=2&&h.at(-1)===h.at(-2)?(h.at(-1)==='P'?'B':'P'):'NA'},
-
- {name:"Trend-3 (เทรนด์ 3)",logic:h=>h.length>=3&&h.slice(-3).every(x=>x===h.at(-1))?h.at(-1):'NA'},
-
- {name:"Follow–Cut (ตาม–ตัด)",logic:h=>h.length>=2?(h.at(-1)===h.at(-2)?(h.at(-1)==='P'?'B':'P'):h.at(-1)):'NA'},
-
- {name:"After-T Follow (ตามหลังเสมอ)",logic:h=>{
-  let i=h.lastIndexOf('T');
-  return i>=0&&h[i+1]?h[i+1]:'NA';
  }}
-
 ];
 
-for(let i=2;i<=6;i++){
- strategies.push({name:`Follow-${i}`,logic:h=>last(h,i)});
- strategies.push({name:`Cut-${i}`,logic:h=>flip(last(h,i))});
- strategies.push({name:`Mirror-${i}`,logic:h=>last(h,i)});
- strategies.push({name:`Major-${i}`,logic:h=>majority(h.slice(-i))});
-}
+strategies.push(
+ {name:"Fake Break Counter (หลอกแล้วสวนเร็ว)",logic:h=>{
+  if(h.length<2)return'NA';
+  let a=h[h.length-2],b=h[h.length-1];
+  if(a===b)return'NA';
+  return b==='P'?'B':'P';
+ }},
+ {name:"Acceleration Trap (กับดักความเร็ว)",logic:h=>{
+  let f=h.filter(x=>x==='P'||x==='B');
+  if(f.length<3)return'NA';
+  let a=f[f.length-3],b=f[f.length-2],c=f[f.length-1];
+  if(a===c&&a!==b)return c==='P'?'B':'P';
+  return'NA';
+ }},
+ {name:"Early Majority Snap (เสียงข้างมากเร็ว)",logic:h=>{
+  if(h.length<3)return'NA';
+  let l=h.slice(-3),
+      p=l.filter(x=>x==='P').length,
+      b=l.filter(x=>x==='B').length;
+  if(p===2)return'P';
+  if(b===2)return'B';
+  return'NA';
+ }},
+ {name:"Pressure Pullback (ดึงกลับจากแรงกด)",logic:h=>{
+  let f=h.filter(x=>x==='P'||x==='B');
+  if(f.length<3)return'NA';
+  let a=f[f.length-3],
+      b=f[f.length-2],
+      c=f[f.length-1];
+  if(a===b && b!==c)return c==='P'?'B':'P';
+  return'NA';
+ }}
+);
 
 strategies.push(
-{name:"Confirm-2-Then-Follow",logic:h=>h.length>=2&&h.at(-1)===h.at(-2)?h.at(-1):'NA'},
-{name:"Streak-2-Then-Cut",logic:h=>h.length>=2&&h.at(-1)===h.at(-2)?flip(h.at(-1)):'NA'},
-{name:"Alt-3-Follow",logic:h=>h.length>=3&&h.at(-1)===h.at(-3)&&h.at(-1)!==h.at(-2)?h.at(-1):'NA'},
-{name:"Last-4-Majority",logic:h=>h.length>=4?majority(h.slice(-4)):'NA'},
-{name:"Confirm-3-Then-Follow",logic:h=>h.length>=3&&h.at(-1)===h.at(-2)&&h.at(-2)===h.at(-3)?h.at(-1):'NA'},
-{name:"Confirm-3-Then-Cut",logic:h=>h.length>=3&&h.at(-1)===h.at(-2)&&h.at(-2)===h.at(-3)?flip(h.at(-1)):'NA'},
-{name:"Alt-2-Repeat",logic:h=>h.length>=3&&h.at(-1)!==h.at(-2)&&h.at(-2)!==h.at(-3)?h.at(-1):'NA'},
-{name:"Last-5-Majority",logic:h=>h.length>=5?majority(h.slice(-5)):'NA'},
-{name:"Break-After-2",logic:h=>h.length>=3&&h.at(-1)!==h.at(-2)&&h.at(-2)===h.at(-3)?h.at(-1):'NA'},
-{name:"Repeat-After-Switch",logic:h=>h.length>=3&&h.at(-1)===h.at(-3)&&h.at(-1)!==h.at(-2)?h.at(-1):'NA'},
+ {
+  name:"Balance Drift Lock (ดักสมดุลทุกตา)",
+  logic:h=>{
+    let f=h.filter(x=>x==='P'||x==='B');
+    if(f.length===0) return 'P';
 
-{name:"Reverse-Major-3",logic:h=>h.length>=3?flip(majority(h.slice(-3))):'NA'},
-{name:"Reverse-Major-5",logic:h=>h.length>=5?flip(majority(h.slice(-5))):'NA'},
-{name:"Reverse-Major-7",logic:h=>h.length>=7?flip(majority(h.slice(-7))):'NA'},
-{name:"Switch-Then-Wait-Follow",logic:h=>h.length>=3&&h.at(-1)!==h.at(-2)&&h.at(-2)!==h.at(-3)?h.at(-1):'NA'},
-{name:"Switch-Then-Wait-Cut",logic:h=>h.length>=3&&h.at(-1)!==h.at(-2)&&h.at(-2)!==h.at(-3)?flip(h.at(-1)):'NA'},
-{name:"Streak-5-Follow",logic:h=>h.length>=5&&h.slice(-5).every(x=>x===h.at(-1))?h.at(-1):'NA'},
-{name:"Streak-5-Cut",logic:h=>h.length>=5&&h.slice(-5).every(x=>x===h.at(-1))?flip(h.at(-1)):'NA'},
-{name:"Alt-4-Confirm",logic:h=>h.length>=4&&h.at(-1)===h.at(-3)&&h.at(-2)===h.at(-4)?h.at(-1):'NA'},
-{name:"Last-6-Mirror",logic:h=>h.length>=6?h.at(-6):'NA'},
-{name:"Gap-3-Cut",logic:h=>h.length>=4?flip(h.at(-3)):'NA'}
+    let w=f.slice(-5);
+    let score=0;
+
+    w.forEach(x=>{
+      if(x==='P') score+=1;
+      else if(x==='B') score-=1;
+    });
+
+    if(score>0) return 'B';
+    if(score<0) return 'P';
+
+    let last=w[w.length-1];
+    return last==='P'?'B':'P';
+  }
+ }
 );
+strategies.push({
+  name:"Swing Depth Reversal (สวนเมื่อสวิงลึก)",
+  logic:h=>{
+    let f=h.filter(x=>x==='P'||x==='B');
+    if(f.length===0) return 'P';
+
+    let last6=f.slice(-6);
+    let score=0;
+
+    last6.forEach(x=>{
+      if(x==='P') score+=1;
+      if(x==='B') score-=1;
+    });
+
+    // ถ้าเอียงแรงเกิน 3 แต้ม → สวน
+    if(score>=3) return 'B';
+    if(score<=-3) return 'P';
+
+    // ถ้าไม่เอียงแรง → ตามแรงล่าสุด
+    let last=f[f.length-1];
+    return last==='P'?'P':'B';
+  }
+});
+
 
 /* ===== FUNCTIONS ===== */
 function addResult(v){results.push(v);updateUI();}
@@ -404,15 +425,15 @@ function calc(s){
   }
  }
 
- let dna = hist.slice(-10)
+ let dna = hist.slice(-20)
 
-let win10 = dna.filter(x => x === "✅").length
-let total10 = dna.length
+ let win20 = dna.filter(x => x === "✅").length
+ let total20 = dna.length
 
-let pct10 = total10 ? Math.round(win10 / total10 * 100) : 0
+ let pct20 = total20 ? Math.round(win20 / total20 * 100) : 0
 
  return{
-  pct:pct10,
+  pct:pct20,
   dna:dna,
   next:s.logic(results.filter(x=>x!=='T'))
  }
@@ -451,7 +472,7 @@ let all=strategies.map(s=>{
 all.sort((a,b)=>b.score-a.score)
 
 // ⭐ ข้ามสูตรที่ให้ NA
-let best = all.find(x => x.next !== 'NA' && x.pct > 0)
+let best = all.find(x => x.next !== 'NA')
 
 return best || all[0]
 
@@ -482,32 +503,21 @@ best.data.pct + "%"
 
  const strategyBox = document.getElementById('strategy-list');
 
-if(strategyBox){
- strategyBox.innerHTML =
- all.map((x,i)=>{
-
-  const next = x.data.next;
-
-  return `
+ if(strategyBox){
+  strategyBox.innerHTML =
+  all.map((x,i)=>`
   <div class="strategy-item ${i===0 && x.data.pct>0 ? 'best':''}">
    <div style="display:flex;justify-content:space-between">
     <b>${x.name}</b>
     <div>
      <span class="win-pct">${x.data.pct}%</span>
-
-     ${
-      next && next !== 'NA'
-      ? `<span class="advice advice-${next.toLowerCase()}">${next}</span>`
-      : `<span class="advice" style="background:#475569">-</span>`
-     }
-
+     <span class="advice advice-${x.data.next.toLowerCase()}">${x.data.next}</span>
     </div>
    </div>
    <div>${x.data.dna.join(' ')}</div>
   </div>
-  `;
- }).join('');
-}
+  `).join('');
+ }
 
  document.getElementById('best-name').innerText =
  all[0].data.pct>0 ? `แนะนำ: ${all[0].name}` : 'รอผลถัดไป';
@@ -535,7 +545,7 @@ ai.next === 'B' ? '#ef4444' :
  ai.name
 
  document.getElementById('ai-dna').innerHTML =
- ai.dna.slice(-10).join(" ")
+ ai.dna.slice(-20).join(" ")
 
  }
 }
